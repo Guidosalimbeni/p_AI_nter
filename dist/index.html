@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Composition App</title>
+    <link rel="stylesheet" href="/index.3a01df49.css">
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">3D Composition App</h1>
+      <div class="upload-area">
+        <label for="fileInput" class="upload-label">Choose files to upload (or drag and drop them here)</label>
+        <input type="file" id="fileInput" accept=".gltf,.glb,.obj" multiple="" class="file-input">
+      </div>
+      <button id="optimizeBtn" class="optimize-btn">
+        Optimize Composition
+      </button>
+      <!-- Canvas container for the Three.js renderer -->
+      <div class="canvas-container"></div>
+    </div>
+    <div id="fitnessScoreContainer">Fitness Score: 0</div>
+
+    <script src="/index.5baa4167.js" defer=""></script>
+  </body>
+</html>

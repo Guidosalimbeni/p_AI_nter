@@ -1,0 +1,93 @@
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+  background-color: #f4f4f4;
+  text-align: center;
+}
+
+.container {
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  max-width: 400px; /* Maximum width of the container */
+  margin: 20px auto;
+}
+
+.title {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.upload-area {
+  margin-bottom: 20px;
+  border: 2px dashed #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.upload-label {
+  display: block;
+  margin-bottom: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.file-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  margin-bottom: 10px;
+}
+
+.optimize-btn {
+  background-color: #008cba;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.optimize-btn:hover {
+  background-color: #005f73;
+}
+.canvas-container {
+  width: 100%; /* Full width to contain the canvas */
+  display: flex;
+  justify-content: center; /* Center children horizontally */
+  margin-top: 20px; /* Space from the above elements */
+}
+
+/* Renderer canvas (assumed to be direct child of .canvas-container) */
+.canvas-container > canvas {
+  max-width: 100%; /* Ensure it doesn't overflow the screen */
+  height: auto; /* Maintain aspect ratio */
+}
+/* Responsive layout for narrow screens */
+@media (max-width: 600px) {
+  .container {
+    width: 90%; /* Take up most of the screen */
+  }
+
+  /* Stack upload area and button */
+  .upload-area,
+  .optimize-btn {
+    width: auto; /* Auto width to fill container */
+    margin: 10px 0; /* Add some margin at the top and bottom */
+  }
+
+  /* Adjust title size for smaller screens */
+  .title {
+    font-size: 24px; /* Smaller font size */
+  }
+  .canvas-container {
+    flex-direction: column; /* Stack children vertically */
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "p_AI_nter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Guidosalimbeni/p_AI_nter.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Guidosalimbeni/p_AI_nter/issues"
+  },
+  "homepage": "https://github.com/Guidosalimbeni/p_AI_nter#readme",
+  "dependencies": {
+    "three": "^0.162.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.12.0"
+  }
+}
