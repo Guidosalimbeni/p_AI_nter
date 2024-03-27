@@ -167,6 +167,23 @@ function animate() {
 
 animate();
 
+// ... (previous code remains the same)
+
+const scoreContainer = document.createElement("div");
+scoreContainer.classList.add("score-container");
+document.body.appendChild(scoreContainer);
+
+const scores = [1, 2, 3, 4, 5];
+scores.forEach((score) => {
+  const scoreButton = document.createElement("button");
+  scoreButton.textContent = score;
+  scoreButton.addEventListener("click", () => {
+    const snapshot = captureWebGLPixelData();
+    saveSnapshot(snapshot, score);
+  });
+  scoreContainer.appendChild(scoreButton);
+});
+
 function captureWebGLPixelData() {
   const width = renderer.domElement.width;
   const height = renderer.domElement.height;
@@ -183,6 +200,25 @@ function captureWebGLPixelData() {
       pixels
     );
   return { data: pixels, width, height };
+}
+
+function saveSnapshot(snapshot, score) {
+  const canvas = document.createElement("canvas");
+  canvas.width = snapshot.width;
+  canvas.height = snapshot.height;
+  const context = canvas.getContext("2d");
+  const imageData = context.createImageData(snapshot.width, snapshot.height);
+  imageData.data.set(snapshot.data);
+  context.putImageData(imageData, 0, 0);
+
+  canvas.toBlob((blob) => {
+    const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
+    const filename = `${score}_${timestamp}.png`;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  }, "image/png");
 }
 
 async function startOptimization() {}
