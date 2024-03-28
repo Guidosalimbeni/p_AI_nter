@@ -223,6 +223,11 @@ function saveSnapshot(snapshot, score) {
 }
 
 async function startOptimization() {
-  const features = await runFeatureExtraction(renderer);
-  console.log("Extracted features:", features);
+  try {
+    const features = await runFeatureExtraction(renderer);
+    console.log("Extracted features:", features);
+    // Perform further processing or optimization using the extracted features
+  } catch (error) {
+    console.error("Error during feature extraction:", error);
+  }
 }

@@ -10,18 +10,30 @@ async function loadModels() {
   featureExtractionModel = await mobilenet.load();
 }
 
-async function extractFeatures(imageData) {
+async function extractFeatures(renderer) {
+  // Capture the rendered image from the Three.js renderer
+  const snapshot = captureWebGLPixelData(renderer);
+
   // Preprocess the image data
-  const tensor = tf.browser.fromPixels(imageData);
-  const processedTensor = tf.expandDims(tensor, 0);
+  const pixelData = new Uint8ClampedArray(snapshot.data);
+  const imageData = new ImageData(pixelData, snapshot.width, snapshot.height);
+  const tensor = tf.browser.fromPixels(imageData, 3);
+
+  console.log("Tensor shape after fromPixels:", tensor.shape);
+
   // Resize the tensor to match the expected input shape
-  const resizedTensor = tf.image.resizeBilinear(processedTensor, [
-    imageData.height,
-    imageData.width,
+  const resizedTensor = tf.image.resizeBilinear(tensor, [
+    snapshot.height,
+    snapshot.width,
   ]);
 
+  console.log("Tensor shape after resizing:", resizedTensor.shape);
+
+  // Cast the tensor to int32
+  const castTensor = resizedTensor.cast("int32");
+
   // Perform segmentation
-  const segmentationPredictions = await segmentationModel.detect(resizedTensor);
+  const segmentationPredictions = await segmentationModel.detect(castTensor);
 
   const features = [];
 
@@ -34,42 +46,48 @@ async function extractFeatures(imageData) {
     // Crop the segmented region from the resized tensor
     const segmentedTensor = tf.slice(
       resizedTensor,
-      [0, y, x, 0],
-      [1, height, width, 3]
+      [y, x, 0],
+      [height, width, 3]
     );
 
+    console.log("Segmented tensor shape:", segmentedTensor.shape);
+
     // Extract features using the pre-trained MobileNet model
-    const featureTensor = featureExtractionModel.infer(segmentedTensor, {
-      embedding: true,
-    });
+    const featureTensor = featureExtractionModel.infer(
+      segmentedTensor.expandDims(),
+      {
+        embedding: true,
+      }
+    );
     const featureArray = await featureTensor.array();
 
     features.push(featureArray[0]);
-
-    // Save the segmented image to disk
-    await saveSegmentedImage(segmentedTensor, i);
   }
 
   // Dispose of the tensors to free up memory
   tensor.dispose();
-  processedTensor.dispose();
   resizedTensor.dispose();
+  castTensor.dispose();
+
   return features;
 }
 
-async function saveSegmentedImage(segmentedTensor, index) {
-  // Convert the segmented tensor to a canvas
-  const segmentedCanvas = document.createElement("canvas");
-  await tf.browser.toPixels(segmentedTensor.squeeze(), segmentedCanvas);
-
-  // Convert the canvas to a data URL
-  const dataUrl = segmentedCanvas.toDataURL("image/png");
-
-  // Create a download link and trigger the download
-  const link = document.createElement("a");
-  link.href = dataUrl;
-  link.download = `segmented_${index}.png`;
-  link.click();
+function captureWebGLPixelData(renderer) {
+  const width = renderer.domElement.width;
+  const height = renderer.domElement.height;
+  const pixels = new Uint8Array(width * height * 4); // 4 components per pixel
+  renderer
+    .getContext()
+    .readPixels(
+      0,
+      0,
+      width,
+      height,
+      renderer.getContext().RGBA,
+      renderer.getContext().UNSIGNED_BYTE,
+      pixels
+    );
+  return { data: pixels, width, height };
 }
 
 export async function runFeatureExtraction(renderer) {
@@ -77,24 +95,8 @@ export async function runFeatureExtraction(renderer) {
     await loadModels();
   }
 
-  // Capture the rendered image
-  const snapshot = renderer.domElement.toDataURL("image/png");
-  const image = new Image();
-  image.src = snapshot;
-
-  await new Promise((resolve) => {
-    image.onload = resolve;
-  });
-
-  const canvas = document.createElement("canvas");
-  canvas.width = image.width;
-  canvas.height = image.height;
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(image, 0, 0);
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
   // Extract features from the captured image
-  const features = await extractFeatures(imageData);
+  const features = await extractFeatures(renderer);
 
   return features;
 }
