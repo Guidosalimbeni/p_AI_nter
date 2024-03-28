@@ -18,7 +18,6 @@ async function extractFeatures(renderer) {
   const pixelData = new Uint8ClampedArray(snapshot.data);
   const imageData = new ImageData(pixelData, snapshot.width, snapshot.height);
   const tensor = tf.browser.fromPixels(imageData, 3);
-
   console.log("Tensor shape after fromPixels:", tensor.shape);
 
   // Resize the tensor to match the expected input shape
@@ -26,7 +25,6 @@ async function extractFeatures(renderer) {
     snapshot.height,
     snapshot.width,
   ]);
-
   console.log("Tensor shape after resizing:", resizedTensor.shape);
 
   // Cast the tensor to int32
@@ -34,13 +32,19 @@ async function extractFeatures(renderer) {
 
   // Perform segmentation
   const segmentationPredictions = await segmentationModel.detect(castTensor);
+  console.log(
+    "Number of segmentation predictions:",
+    segmentationPredictions.length
+  );
 
   const features = [];
 
   // Extract features for each segmented object
   for (let i = 0; i < segmentationPredictions.length; i++) {
     const prediction = segmentationPredictions[i];
-    const { bbox } = prediction;
+    const { bbox, class: className, score } = prediction;
+    console.log(`Prediction ${i + 1}: Class: ${className}, Score: ${score}`);
+
     const [x, y, width, height] = bbox;
 
     // Crop the segmented region from the resized tensor
@@ -49,7 +53,6 @@ async function extractFeatures(renderer) {
       [y, x, 0],
       [height, width, 3]
     );
-
     console.log("Segmented tensor shape:", segmentedTensor.shape);
 
     // Extract features using the pre-trained MobileNet model
@@ -60,7 +63,6 @@ async function extractFeatures(renderer) {
       }
     );
     const featureArray = await featureTensor.array();
-
     features.push(featureArray[0]);
   }
 
