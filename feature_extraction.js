@@ -14,11 +14,14 @@ async function extractFeatures(imageData) {
   // Preprocess the image data
   const tensor = tf.browser.fromPixels(imageData);
   const processedTensor = tf.expandDims(tensor, 0);
+  // Resize the tensor to match the expected input shape
+  const resizedTensor = tf.image.resizeBilinear(processedTensor, [
+    imageData.height,
+    imageData.width,
+  ]);
 
   // Perform segmentation
-  const segmentationPredictions = await segmentationModel.detect(
-    processedTensor
-  );
+  const segmentationPredictions = await segmentationModel.detect(resizedTensor);
 
   const features = [];
 
@@ -28,9 +31,9 @@ async function extractFeatures(imageData) {
     const { bbox } = prediction;
     const [x, y, width, height] = bbox;
 
-    // Crop the segmented region from the image
+    // Crop the segmented region from the resized tensor
     const segmentedTensor = tf.slice(
-      processedTensor,
+      resizedTensor,
       [0, y, x, 0],
       [1, height, width, 3]
     );
@@ -50,7 +53,7 @@ async function extractFeatures(imageData) {
   // Dispose of the tensors to free up memory
   tensor.dispose();
   processedTensor.dispose();
-
+  resizedTensor.dispose();
   return features;
 }
 
