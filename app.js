@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+import { runFeatureExtraction } from "./feature_extraction.js";
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#ffffff");
@@ -118,16 +119,16 @@ function onKeyDown(event) {
   if (selectedObject) {
     switch (event.key) {
       case "ArrowLeft":
-        selectedObject.position.x -= 0.1;
+        selectedObject.position.x -= 0.05;
         break;
       case "ArrowRight":
-        selectedObject.position.x += 0.1;
+        selectedObject.position.x += 0.05;
         break;
       case "ArrowUp":
-        selectedObject.position.z -= 0.1;
+        selectedObject.position.z -= 0.05;
         break;
       case "ArrowDown":
-        selectedObject.position.z += 0.1;
+        selectedObject.position.z += 0.05;
         break;
       case "q":
         selectedObject.rotation.y -= 0.1;
@@ -221,4 +222,7 @@ function saveSnapshot(snapshot, score) {
   }, "image/png");
 }
 
-async function startOptimization() {}
+async function startOptimization() {
+  const features = await runFeatureExtraction(renderer);
+  console.log("Extracted features:", features);
+}
