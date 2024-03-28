@@ -1,8 +1,9 @@
 import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { runFeatureExtraction } from "./feature_extraction.js";
+import { processObject } from "./feature_extraction.js";
 
+// ... (rest of the code remains the same)
 const scene = new THREE.Scene();
 scene.background = new THREE.Color("#ffffff");
 
@@ -168,8 +169,6 @@ function animate() {
 
 animate();
 
-// ... (previous code remains the same)
-
 const scoreContainer = document.createElement("div");
 scoreContainer.classList.add("score-container");
 document.body.appendChild(scoreContainer);
@@ -224,10 +223,35 @@ function saveSnapshot(snapshot, score) {
 
 async function startOptimization() {
   try {
-    const features = await runFeatureExtraction(renderer);
-    console.log("Extracted features:", features);
-    // Perform further processing or optimization using the extracted features
+    const sceneData = [];
+
+    for (const object of objects) {
+      // Disable rendering for all objects except the current one
+      objects.forEach((obj) => {
+        obj.visible = obj === object;
+      });
+
+      // Render the scene with only the current object visible
+      render();
+
+      // Capture the snapshot of the current object
+      const snapshot = captureWebGLPixelData();
+
+      // Process the object and its snapshot
+      const objectData = await processObject(object, snapshot);
+
+      // Add the object data to the scene data list
+      sceneData.push(objectData);
+
+      // Re-enable rendering for all objects
+      objects.forEach((obj) => {
+        obj.visible = true;
+      });
+    }
+
+    console.log("Scene data:", sceneData);
+    // Perform further processing or optimization using the scene data
   } catch (error) {
-    console.error("Error during feature extraction:", error);
+    console.error("Error during optimization:", error);
   }
 }
