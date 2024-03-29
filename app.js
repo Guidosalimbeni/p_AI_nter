@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { processObject } from "./feature_extraction.js";
+import { randomlyPlaceObjects, saveImage } from "./random_pics.js";
 
 // ... (rest of the code remains the same)
 const scene = new THREE.Scene();
@@ -220,6 +221,11 @@ function saveSnapshot(snapshot, score) {
     link.click();
   }, "image/png");
 }
+
+document.getElementById("randomPlaceBtn").addEventListener("click", () => {
+  randomlyPlaceObjects(objects, render);
+  saveImage(renderer, scene, camera, captureWebGLPixelData);
+});
 
 async function startOptimization() {
   try {
