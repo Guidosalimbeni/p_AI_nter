@@ -38,8 +38,9 @@ camera.position.y = 0.2;
 
 const objects = [];
 let selectedObject = null;
+const fileNames = [];
 
-function loadModel(url) {
+function loadModel(url, fileName) {
   const loader = new OBJLoader();
   loader.load(url, function (object) {
     const material = new THREE.MeshPhongMaterial({ color: "#f0efe6" });
@@ -53,6 +54,7 @@ function loadModel(url) {
     object.position.set(0, -0.5, 1);
     scene.add(object);
     objects.push(object);
+    fileNames.push(fileName);
     render();
   });
 }
@@ -63,7 +65,8 @@ document
     const files = event.target.files;
     for (const file of files) {
       const url = URL.createObjectURL(file);
-      loadModel(url);
+      const fileName = file.name.split(".")[0]; // Extract the file name without the extension
+      loadModel(url, fileName);
     }
   });
 
@@ -214,7 +217,8 @@ function saveSnapshot(snapshot, score) {
 
   canvas.toBlob((blob) => {
     const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
-    const filename = `${score}_${timestamp}.png`;
+    const fileNamePrefix = fileNames.join("_");
+    const filename = `${score}_${fileNamePrefix}_${timestamp}.png`;
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = filename;
@@ -224,7 +228,11 @@ function saveSnapshot(snapshot, score) {
 
 document.getElementById("randomPlaceBtn").addEventListener("click", () => {
   randomlyPlaceObjects(objects, render);
-  saveImage(renderer, scene, camera, captureWebGLPixelData);
+  saveImage(renderer, scene, camera, captureWebGLPixelData, fileNames);
+});
+
+document.getElementById("randomBtn").addEventListener("click", () => {
+  randomlyPlaceObjects(objects, render);
 });
 
 async function startOptimization() {

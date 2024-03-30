@@ -7,9 +7,10 @@ function randomlyPlaceObjects(objects, render) {
   render();
 }
 
-function saveImage(renderer, scene, camera, captureWebGLPixelData) {
+function saveImage(renderer, scene, camera, captureWebGLPixelData, fileNames) {
   const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
-  const filename = `train_${timestamp}.png`;
+  const fileNamePrefix = fileNames.join("_");
+  const filename = `train_${fileNamePrefix}_${timestamp}.png`;
 
   renderer.render(scene, camera);
   const snapshot = captureWebGLPixelData();
