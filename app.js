@@ -161,6 +161,16 @@ scene.add(ambientLight);
 const hemiLight = new THREE.HemisphereLight(0xffffff, "#838572", 0.5);
 scene.add(hemiLight);
 
+// Add keyboard letter k and l event listener to move the light x position left and right
+document.addEventListener("keydown", (event) => {
+  if (event.key === "k") {
+    // console.log("light.position.x", light.position.x);
+    light.position.x -= 0.1;
+  } else if (event.key === "l") {
+    light.position.x += 0.1;
+  }
+});
+
 function render() {
   renderer.render(scene, camera);
 }
@@ -240,24 +250,18 @@ async function startOptimization() {
     const sceneData = [];
 
     for (const object of objects) {
-      // Disable rendering for all objects except the current one
       objects.forEach((obj) => {
         obj.visible = obj === object;
       });
 
-      // Render the scene with only the current object visible
       render();
 
-      // Capture the snapshot of the current object
       const snapshot = captureWebGLPixelData();
 
-      // Process the object and its snapshot
       const objectData = await processObject(object, snapshot);
 
-      // Add the object data to the scene data list
       sceneData.push(objectData);
 
-      // Re-enable rendering for all objects
       objects.forEach((obj) => {
         obj.visible = true;
       });
