@@ -584,12 +584,12 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"8ji42":[function(require,module,exports) {
-// random_pics.js
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "randomlyPlaceObjects", ()=>randomlyPlaceObjects);
 parcelHelpers.export(exports, "saveImage", ()=>saveImage);
 function randomlyPlaceObjects(objects, render) {
+    console.log("I randomly moving objects..");
     objects.forEach((object)=>{
         object.position.set(Math.random() * 4 - 2, -0.5, Math.random() * 2 - 1);
         object.rotation.y = Math.random() * Math.PI * 2;
