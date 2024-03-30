@@ -4,6 +4,8 @@ npm install -D parcel
 
 npm run start
 
+while running the rest api using python api.py command on another terminal
+
 template
 
 {

@@ -7,6 +7,28 @@ async function loadModel() {
   featureExtractionModel = await mobilenet.load();
 }
 
+async function pyythonProcessImageData(imageData, objectPositions) {
+  try {
+    console.log("Processing image data...");
+    const response = await fetch("http://localhost:5000/process-image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        imageData: imageData,
+        objectPositions: objectPositions,
+      }),
+    });
+
+    const data = await response.json();
+    console.log("Processed data:", data.processedData);
+    // Update your application with the processed data
+  } catch (error) {
+    console.error("Error processing image data:", error);
+  }
+}
+
 export async function processObject(object, snapshot) {
   if (!featureExtractionModel) {
     await loadModel();
@@ -35,6 +57,13 @@ export async function processObject(object, snapshot) {
   // Extract position and rotation from the object
   const position = object.position;
   const rotation = object.rotation;
+
+  // python processing
+  await pyythonProcessImageData(imageData, [
+    position.x,
+    position.y,
+    position.z,
+  ]);
 
   // Return the object data
   return {
