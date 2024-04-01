@@ -198,6 +198,25 @@ scores.forEach((score) => {
   scoreContainer.appendChild(scoreButton);
 });
 
+//
+
+const scoreContainer2 = document.createElement("div");
+scoreContainer2.classList.add("score-container");
+document.body.appendChild(scoreContainer2);
+
+const scores2 = [1, 2, 3, 4, 5];
+scores2.forEach((score) => {
+  const scoreButton = document.createElement("button");
+  scoreButton.textContent = score;
+  scoreButton.addEventListener("click", () => {
+    const snapshot = capture2WebGLPixelData();
+    save2Snapshot(snapshot, score);
+  });
+  scoreContainer2.appendChild(scoreButton);
+});
+
+//
+
 function captureWebGLPixelData() {
   const width = renderer.domElement.width;
   const height = renderer.domElement.height;
@@ -214,6 +233,46 @@ function captureWebGLPixelData() {
       pixels
     );
   return { data: pixels, width, height };
+}
+
+function capture2WebGLPixelData() {
+  const width = renderer.domElement.width;
+  const height = renderer.domElement.height;
+  const pixelRatio = window.devicePixelRatio;
+  const frameWidth = width * pixelRatio;
+  const frameHeight = height * pixelRatio;
+
+  const buffer = new Uint8Array(frameWidth * frameHeight * 4);
+  renderer.readRenderTargetPixels(
+    renderer.getRenderTarget(),
+    0,
+    0,
+    frameWidth,
+    frameHeight,
+    buffer
+  );
+
+  const canvas = document.createElement("canvas");
+  canvas.width = frameWidth;
+  canvas.height = frameHeight;
+  const context = canvas.getContext("2d");
+  const imageData = context.createImageData(frameWidth, frameHeight);
+  imageData.data.set(buffer);
+  context.putImageData(imageData, 0, 0);
+
+  return canvas;
+}
+
+function save2Snapshot(canvas, score) {
+  canvas.toBlob((blob) => {
+    const timestamp = new Date().toISOString().replace(/[-:.]/g, "");
+    const fileNamePrefix = fileNames.join("_");
+    const filename = `${score}_${fileNamePrefix}_${timestamp}.png`;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  }, "image/png");
 }
 
 function saveSnapshot(snapshot, score) {
